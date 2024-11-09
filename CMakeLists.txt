@@ -16,6 +16,6 @@ nanobind_add_module(_rms_norm NB_STATIC "klujax_ffi/rms_norm.cc")
 target_include_directories(_rms_norm PUBLIC ${XLA_DIR})
 install(TARGETS _rms_norm LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})
 
-nanobind_add_module(_klujax NB_STATIC "klujax_ffi/rms_norm.cc")
+nanobind_add_module(_klujax NB_STATIC "klujax_ffi/klujax.cc")
 target_include_directories(_klujax PUBLIC ${XLA_DIR})
 install(TARGETS _klujax LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})

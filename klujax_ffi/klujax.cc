@@ -6,6 +6,12 @@ using namespace std;
 #include <vector>
 
 #include <klu.h>
+#include "nanobind/nanobind.h"
+#include "xla/ffi/api/c_api.h"
+#include "xla/ffi/api/ffi.h"
+
+namespace nb = nanobind;
+namespace ffi = xla::ffi;
 
 void coo_to_csc_analyze(int n_col, int n_nz, int *Ai, int *Aj, int *Bi, int *Bp,
                         int *Bk) {
@@ -44,7 +50,7 @@ void coo_to_csc_analyze(int n_col, int n_nz, int *Ai, int *Aj, int *Bi, int *Bp,
   }
 }
 
-void solve_f64(
+void solve_f64_impl(
     int n_col, int n_lhs, int n_rhs, int Anz, int *Ai, int *Aj, 
     double *Ax, double *b, double *result
   ){
@@ -115,6 +121,42 @@ void coo_mul_vec_f64(
   }
 }
 
+ffi::Error solve_f64_wrapped(
+  int n_col,
+  int n_lhs,
+  int n_rhs,
+  int n_nz,
+  ffi::Buffer<ffi::S32> Ai,
+  ffi::Buffer<ffi::S32> Aj, //TODO: should be uint as not negative 
+  ffi::Buffer<ffi::F64> Ax,
+  ffi::Buffer<ffi::F64> b,
+  ffi::Result<ffi::Buffer<ffi::F64>> res) 
+{
+  solve_f64_impl(n_col, n_lhs, n_rhs, n_nz, 
+    Ai.typed_data(), 
+    Aj.typed_data(), 
+    Ax.typed_data(), 
+    b.typed_data(), 
+    res->typed_data());
+  return ffi::Error::Success();
+}
+
+// Wrap `solve_f64` and specify the interface to XLA. If you need to declare
+// this handler in a header, you can use the `XLA_FFI_DECLASE_HANDLER_SYMBOL`
+// macro: `XLA_FFI_DECLASE_HANDLER_SYMBOL(solve_f64)`.
+XLA_FFI_DEFINE_HANDLER_SYMBOL(solve_f64, solve_f64_wrapped,
+                              ffi::Ffi::Bind()
+                                  .Attr<int>("n_col")
+                                  .Attr<int>("n_lhs")
+                                  .Attr<int>("n_rhs")
+                                  .Attr<int>("n_nz")
+                                  .Arg<ffi::Buffer<ffi::S32>>()  // Ai
+                                  .Arg<ffi::Buffer<ffi::S32>>()  // Aj
+                                  .Arg<ffi::Buffer<ffi::F64>>()  // Ax
+                                  .Arg<ffi::Buffer<ffi::F64>>()  // b
+                                  .Ret<ffi::Buffer<ffi::F64>>()  // res
+);
+
 // main() is where program execution begins.
 int main() {
   int n_col = 5;
@@ -132,7 +174,7 @@ int main() {
 
   double result[n_col*n_rhs];
 
-  solve_f64(
+  solve_f64_impl(
     n_col, n_lhs, n_rhs, n_nz, Ai, Aj, 
     Ax, b, result
   );
