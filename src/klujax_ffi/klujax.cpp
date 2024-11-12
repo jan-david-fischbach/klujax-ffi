@@ -171,31 +171,3 @@ NB_MODULE(_klujax, m) {
     return registrations;
   });
 }
-
-// // main() is where program execution begins.
-// int main() {
-//   int n_col = 5;
-//   int n_lhs = 1; //Batch 1
-//   int n_nz = 5;
-//   int n_rhs = 1; //Batch 2
-
-//   double Ax[n_nz];
-//   std::fill_n(Ax, n_nz, 2);
-//   double b[n_col*n_rhs];
-//   std::fill_n(b, n_col*n_rhs, 3);
-
-//   int Ai[n_nz] = {0, 1, 2, 3, 4};
-//   int Aj[n_nz] = {0, 3, 2, 1, 4};
-
-//   double result[n_col*n_rhs];
-
-//   solve_f64_impl(
-//     n_col, n_lhs, n_rhs, n_nz, Ai, Aj, 
-//     Ax, b, result
-//   );
-  
-//   cout << "Hello World: You are mine" << endl; // prints Hello World
-
-//   cout << result[0] << endl;
-//   return 0;
-// }

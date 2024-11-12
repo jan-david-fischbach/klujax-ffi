@@ -13,17 +13,38 @@ message(STATUS "We are located in: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package(nanobind CONFIG REQUIRED)
 
-file(GLOB_RECURSE SRCS_SUITSPARSE ${CMAKE_CURRENT_SOURCE_DIR}/build_dep/*.c)
-file(GLOB_RECURSE HDRS_SUITSPARSE ${CMAKE_CURRENT_SOURCE_DIR}/build_dep/*.h)
+file(
+  GLOB_RECURSE SRCS_SUITSPARSE 
+  suitesparse/SuiteSparse_config/*.c
+  suitesparse/AMD/Source/*.c
+  suitesparse/BTF/Source/*.c
+  suitesparse/COLAMD/Source/*.c
+  suitesparse/KLU/Source/*.c
+)
 
-#message(STATUS "The following Suitsparse Headers were found: ${HDRS_SUITSPARSE}")
-#message(STATUS "The following Suitsparse Sources were found: ${SRCS_SUITSPARSE}")
+# file(
+#   GLOB_RECURSE HDRS_SUITSPARSE 
+#   suitesparse/SuiteSparse_config/*.h
+#   suitesparse/AMD/Include/*.h
+#   suitesparse/BTF/Include/*.h
+#   suitesparse/COLAMD/Include/*.h
+#   suitesparse/KLU/Include/*.h
+# )
 
-nanobind_add_module(_rms_norm NB_STATIC "src/klujax_ffi/rms_norm.cpp")
-target_include_directories(_rms_norm PUBLIC ${XLA_DIR})
-install(TARGETS _rms_norm LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})
+set(
+  HDRS_SUITSPARSE 
+  suitesparse/SuiteSparse_config/
+  suitesparse/AMD/Include/
+  suitesparse/BTF/Include/
+  suitesparse/COLAMD/Include/
+  suitesparse/KLU/Include/
+)
 
-add_library(SuiteSparse ${SRCS_SUITSPARSE} ${HDRS_SUITSPARSE})
+message(STATUS "The following Suitsparse Headers were found: ${HDRS_SUITSPARSE}")
+message(STATUS "The following Suitsparse Sources were found: ${SRCS_SUITSPARSE}")
+
+add_library(SuiteSparse ${SRCS_SUITSPARSE})
+target_include_directories(SuiteSparse PRIVATE ${HDRS_SUITSPARSE})
 set_source_files_properties(${SRCS_SUITSPARSE} PROPERTIES LANGUAGE C)
 set_target_properties(SuiteSparse PROPERTIES LINKER_LANGUAGE C)
 set_property(TARGET SuiteSparse PROPERTY POSITION_INDEPENDENT_CODE ON) 
