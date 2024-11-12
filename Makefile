@@ -32,8 +32,8 @@ $(SRC_DIR):
 	cp klujax_ffi/klujax.cpp build
 
 
-klujax.out: $(OBJ_FILES) klujax_ffi/klujax.cpp
-	$(CC) -o klujax.out $(CPPFLAGS) klujax_ffi/klujax.cpp $(OBJ_FILES)
+klujax.out: $(OBJ_FILES) src/klujax_ffi/klujax.cpp
+	$(CC) -o klujax.out $(CPPFLAGS) src/klujax_ffi/klujax.cpp $(OBJ_FILES)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c -o $@ $<

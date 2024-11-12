@@ -160,14 +160,14 @@ XLA_FFI_DEFINE_HANDLER_SYMBOL(solve_f64, solve_f64_wrapped,
 template <typename T>
 nb::capsule EncapsulateFfiHandler(T *fn) {
   static_assert(std::is_invocable_r_v<XLA_FFI_Error *, T, XLA_FFI_CallFrame *>,
-                "Encapsulated function must be and XLA FFI handler");
+                "Encapsulated function must be an XLA FFI handler");
   return nb::capsule(reinterpret_cast<void *>(fn));
 }
 
 NB_MODULE(_klujax, m) {
   m.def("registrations", []() {
     nb::dict registrations;
-    registrations["rms_norm"] = EncapsulateFfiHandler(solve_f64);
+    registrations["solve_f64"] = EncapsulateFfiHandler(solve_f64);
     return registrations;
   });
 }

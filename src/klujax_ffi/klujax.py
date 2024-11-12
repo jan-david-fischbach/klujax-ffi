@@ -26,4 +26,10 @@ def solve_f64(n_col, n_lhs, n_rhs, n_nz, Ai, Aj, Ax, b):
     "solve_f64",
     out_type,
     vmap_method="broadcast_all",
-  )(Ai, Aj, Ax, b, n_col=n_col, n_lhs=n_lhs, n_rhs=n_rhs, n_nz=n_nz)
+  )(
+    Ai, Aj, Ax, b, 
+    n_col=np.int32(n_col), 
+    n_lhs=np.int32(n_lhs), 
+    n_rhs=np.int32(n_rhs), 
+    n_nz= np.int32(n_nz)
+  )

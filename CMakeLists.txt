@@ -1,21 +1,38 @@
 cmake_minimum_required(VERSION 3.15...3.30)
-project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX C)
 
 find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
+
 execute_process(
   COMMAND "${Python_EXECUTABLE}"
           "-c" "from jax.extend import ffi; print(ffi.include_dir())"
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE XLA_DIR)
+
 message(STATUS "XLA include directory: ${XLA_DIR}")
 message(STATUS "We are located in: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package(nanobind CONFIG REQUIRED)
 
-nanobind_add_module(_rms_norm NB_STATIC "src/klujax_ffi/rms_norm.cc")
+file(GLOB_RECURSE SRCS_SUITSPARSE ${CMAKE_CURRENT_SOURCE_DIR}/build_dep/*.c)
+file(GLOB_RECURSE HDRS_SUITSPARSE ${CMAKE_CURRENT_SOURCE_DIR}/build_dep/*.h)
+
+#message(STATUS "The following Suitsparse Headers were found: ${HDRS_SUITSPARSE}")
+#message(STATUS "The following Suitsparse Sources were found: ${SRCS_SUITSPARSE}")
+
+nanobind_add_module(_rms_norm NB_STATIC "src/klujax_ffi/rms_norm.cpp")
 target_include_directories(_rms_norm PUBLIC ${XLA_DIR})
 install(TARGETS _rms_norm LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})
 
-nanobind_add_module(_klujax NB_STATIC "src/klujax_ffi/klujax.cc")
+add_library(SuiteSparse ${SRCS_SUITSPARSE} ${HDRS_SUITSPARSE})
+set_source_files_properties(${SRCS_SUITSPARSE} PROPERTIES LANGUAGE C)
+set_target_properties(SuiteSparse PROPERTIES LINKER_LANGUAGE C)
+set_property(TARGET SuiteSparse PROPERTY POSITION_INDEPENDENT_CODE ON) 
+# TODO figure out shared linking
+install(TARGETS SuiteSparse LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})
+
+nanobind_add_module(_klujax NB_STATIC "src/klujax_ffi/klujax.cpp")
 target_include_directories(_klujax PUBLIC ${XLA_DIR} build_dep)
-target_link_libraries(_klujax PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/build_dep/obj)
+
+target_link_libraries(_klujax PRIVATE SuiteSparse)
 install(TARGETS _klujax LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})
+
