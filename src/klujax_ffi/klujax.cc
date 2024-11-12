@@ -157,30 +157,45 @@ XLA_FFI_DEFINE_HANDLER_SYMBOL(solve_f64, solve_f64_wrapped,
                                   .Ret<ffi::Buffer<ffi::F64>>()  // res
 );
 
-// main() is where program execution begins.
-int main() {
-  int n_col = 5;
-  int n_lhs = 1; //Batch 1
-  int n_nz = 5;
-  int n_rhs = 1; //Batch 2
-
-  double Ax[n_nz];
-  std::fill_n(Ax, n_nz, 2);
-  double b[n_col*n_rhs];
-  std::fill_n(b, n_col*n_rhs, 3);
-
-  int Ai[n_nz] = {0, 1, 2, 3, 4};
-  int Aj[n_nz] = {0, 3, 2, 1, 4};
-
-  double result[n_col*n_rhs];
-
-  solve_f64_impl(
-    n_col, n_lhs, n_rhs, n_nz, Ai, Aj, 
-    Ax, b, result
-  );
-  
-  cout << "Hello World: You are mine" << endl; // prints Hello World
-
-  cout << result[0] << endl;
-  return 0;
+template <typename T>
+nb::capsule EncapsulateFfiHandler(T *fn) {
+  static_assert(std::is_invocable_r_v<XLA_FFI_Error *, T, XLA_FFI_CallFrame *>,
+                "Encapsulated function must be and XLA FFI handler");
+  return nb::capsule(reinterpret_cast<void *>(fn));
 }
+
+NB_MODULE(_klujax, m) {
+  m.def("registrations", []() {
+    nb::dict registrations;
+    registrations["rms_norm"] = EncapsulateFfiHandler(solve_f64);
+    return registrations;
+  });
+}
+
+// // main() is where program execution begins.
+// int main() {
+//   int n_col = 5;
+//   int n_lhs = 1; //Batch 1
+//   int n_nz = 5;
+//   int n_rhs = 1; //Batch 2
+
+//   double Ax[n_nz];
+//   std::fill_n(Ax, n_nz, 2);
+//   double b[n_col*n_rhs];
+//   std::fill_n(b, n_col*n_rhs, 3);
+
+//   int Ai[n_nz] = {0, 1, 2, 3, 4};
+//   int Aj[n_nz] = {0, 3, 2, 1, 4};
+
+//   double result[n_col*n_rhs];
+
+//   solve_f64_impl(
+//     n_col, n_lhs, n_rhs, n_nz, Ai, Aj, 
+//     Ax, b, result
+//   );
+  
+//   cout << "Hello World: You are mine" << endl; // prints Hello World
+
+//   cout << result[0] << endl;
+//   return 0;
+// }

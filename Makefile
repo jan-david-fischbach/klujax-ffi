@@ -1,5 +1,5 @@
-SRC_DIR = build
-OBJ_DIR = build/obj
+SRC_DIR = build_dep
+OBJ_DIR = $(SRC_DIR)/obj
 IDIR=$(SRC_DIR)
 CC=g++
 CPPFLAGS=-I$(IDIR) -L$(OBJ_DIR) -g
@@ -14,7 +14,7 @@ suitesparse:
 	git clone --depth 1 --branch v7.2.0 https://github.com/DrTimothyAldenDavis/SuiteSparse suitesparse || true
 	cd suitesparse && rm -rf .git
 
-build:
+$(SRC_DIR):
 	mkdir $(SRC_DIR)
 	mkdir $(OBJ_DIR)
 	cp suitesparse/SuiteSparse_config/*.h build 

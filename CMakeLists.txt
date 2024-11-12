@@ -1,21 +1,21 @@
 cmake_minimum_required(VERSION 3.15...3.30)
 project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
-option(JAX_FFI_EXAMPLE_ENABLE_CUDA "Enable CUDA support" OFF)
-
 find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
 execute_process(
   COMMAND "${Python_EXECUTABLE}"
           "-c" "from jax.extend import ffi; print(ffi.include_dir())"
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE XLA_DIR)
 message(STATUS "XLA include directory: ${XLA_DIR}")
+message(STATUS "We are located in: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package(nanobind CONFIG REQUIRED)
 
-nanobind_add_module(_rms_norm NB_STATIC "klujax_ffi/rms_norm.cc")
+nanobind_add_module(_rms_norm NB_STATIC "src/klujax_ffi/rms_norm.cc")
 target_include_directories(_rms_norm PUBLIC ${XLA_DIR})
 install(TARGETS _rms_norm LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})
 
-nanobind_add_module(_klujax NB_STATIC "klujax_ffi/klujax.cc")
-target_include_directories(_klujax PUBLIC ${XLA_DIR})
+nanobind_add_module(_klujax NB_STATIC "src/klujax_ffi/klujax.cc")
+target_include_directories(_klujax PUBLIC ${XLA_DIR} build_dep)
+target_link_libraries(_klujax PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/build_dep/obj)
 install(TARGETS _klujax LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME})

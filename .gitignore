@@ -10,6 +10,7 @@ suitesparse
 # Distribution / packaging
 .Python
 build/
+build_dep/
 develop-eggs/
 dist/
 downloads/
