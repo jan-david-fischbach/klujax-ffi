@@ -22,15 +22,6 @@ file(
   suitesparse/KLU/Source/*.c
 )
 
-# file(
-#   GLOB_RECURSE HDRS_SUITSPARSE 
-#   suitesparse/SuiteSparse_config/*.h
-#   suitesparse/AMD/Include/*.h
-#   suitesparse/BTF/Include/*.h
-#   suitesparse/COLAMD/Include/*.h
-#   suitesparse/KLU/Include/*.h
-# )
-
 set(
   HDRS_SUITSPARSE 
   suitesparse/SuiteSparse_config/
@@ -40,8 +31,8 @@ set(
   suitesparse/KLU/Include/
 )
 
-message(STATUS "The following Suitsparse Headers were found: ${HDRS_SUITSPARSE}")
-message(STATUS "The following Suitsparse Sources were found: ${SRCS_SUITSPARSE}")
+# message(STATUS "The following Suitsparse Headers were found: ${HDRS_SUITSPARSE}")
+# message(STATUS "The following Suitsparse Sources were found: ${SRCS_SUITSPARSE}")
 
 add_library(SuiteSparse ${SRCS_SUITSPARSE})
 target_include_directories(SuiteSparse PRIVATE ${HDRS_SUITSPARSE})

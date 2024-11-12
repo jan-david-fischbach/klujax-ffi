@@ -1,9 +1,15 @@
-# End-to-end example usage for JAX's foreign function interface
+# Klujax with jax FFI
 
-This directory includes an example project demonstrating the use of JAX's
-foreign function interface (FFI). The JAX docs provide more information about
-this interface in [the FFI tutorial](https://jax.readthedocs.io/en/latest/ffi.html),
-but the example in this directory explicitly demonstrates:
+Currently only f64 is implemented and no introspection on the array shapes is performed. As such the arguments including sizes have to be prepared by the user.
 
-1. One way to package and distribute FFI targets, and
-2. Some more advanced use cases.
+Make sure to 
+```
+make suitesparse
+```
+
+before 
+```
+pip install .
+```
+
+The (one) test I have implemented so far seems to give back b instead of the solution vector... Maybe I am missing something here?
